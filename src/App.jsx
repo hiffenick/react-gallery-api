@@ -1,14 +1,20 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const App = () => {
 
+  const [next,setnext] = useState(1)
+  const [loaded, setLoaded] = useState(false);
   const [imgs ,updtImgs] = useState(null);
 
-  const resp = async () =>{
-    const result = await axios.get('https://picsum.photos/v2/list?page=3&limit=10');
+  useEffect(()=>{
+    const resp = async () =>{
+    if (!loaded) return;
+    const result = await axios.get(`https://picsum.photos/v2/list?page=${next}&limit=10`);
     updtImgs(result.data);
   }
+  resp()
+  },[next,loaded])
   return (
     <main className="min-h-screen bg-gray-900 text-white p-8">
       {/* Header */}
@@ -26,7 +32,7 @@ const App = () => {
           <button
             className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition active:scale-95"
             onClick={()=>{
-              resp()
+              setLoaded(true);
             }}
           >
             Get Images
@@ -59,7 +65,29 @@ const App = () => {
     ))}
   </div>
 )}
-        
+      {imgs &&
+      <div className="flex justify-center gap-4 mt-8">
+  <button
+  onClick={()=>{
+      if(next > 1){
+        setnext(next - 1)
+      }
+    }}
+    class="px-5 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 active:scale-95 transition"
+  >
+    Previous
+  </button>
+
+  <button
+    onClick={()=>{
+      console.log(next)
+      setnext(next + 1)
+    }}
+    class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:scale-95 transition"
+  >
+    Next
+  </button>
+</div>}
       </div>
     </main>
   );
